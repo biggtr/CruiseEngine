@@ -1,9 +1,11 @@
 #include "Application.h"
+#include "Game.h"
 #include "Core/Logger.h"
 #include "Platform/OS/Platform.h"
 
 struct Application 
 {
+    Game* gameInstance;
     bool8 IsRunning;
     bool8 IsSuspended;
     Platform* platform;
@@ -15,7 +17,7 @@ struct Application
 static bool8 Initialized = FALSE;
 static Application application;
 
-bool8 ApplicationCreate(ApplicataionConfig* appConfig)
+bool8 ApplicationCreate(Game* gameInstance)
 {
     if(Initialized)
     {
@@ -30,13 +32,28 @@ bool8 ApplicationCreate(ApplicataionConfig* appConfig)
     CTRACE("TEST: %.2f",3.14f);
     CDEBUG("TEST: %.2f",3.14f);
 
+    application.gameInstance = gameInstance;
+
+    application.gameInstance->Initialize(gameInstance);
     application.IsRunning = TRUE;
     application.IsSuspended = FALSE;
 
-    if(!PlatfromStartup(&application.platform, appConfig->x, appConfig->y, appConfig->width, appConfig->height))
+
+    if(!PlatfromStartup(&application.platform,
+                application.gameInstance->appConfig.x,
+                application.gameInstance->appConfig.y,
+                application.gameInstance->appConfig.width,
+                application.gameInstance->appConfig.height
+                ))
     {
         return FALSE;
     }
+    if(!application.gameInstance->Initialize(application.gameInstance))
+    {
+        CDEBUG("Couldn't Initialize The Game..!");
+        return FALSE;
+    }
+
 
     Initialized = TRUE;
     return TRUE;
@@ -51,6 +68,10 @@ bool8 ApplicationRun()
             CFATAL("Something Went Wrong with PlatformEventLoop");
             application.IsRunning = FALSE;
             application.IsSuspended = TRUE;
+        }
+        if(application.IsSuspended)
+        {
+            
         }
     }
     application.IsRunning = FALSE;

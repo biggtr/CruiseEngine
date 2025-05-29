@@ -3,7 +3,8 @@
 add_executable(TestGame)
 target_sources(TestGame
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+    src/TestGame.cpp
+    src/TestGameEntry.cpp
 )
 target_include_directories(TestGame
     PRIVATE

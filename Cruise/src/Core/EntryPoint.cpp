@@ -1,19 +1,27 @@
 #include "Application.h"
 #include "Core/Logger.h"
+#include "Game.h"
+
 int main()
 {
 
-    ApplicataionConfig appConfig;
-    appConfig.x = 100;
-    appConfig.y = 100;
-    appConfig.width = 1280;
-    appConfig.height = 720;
-    appConfig.name = "Cruise Engine";
+    Game game;
+    if(!CreateGame(&game))
+    {
+        CFATAL("Couldn't Create Game Instance");
+        return -1;
+    }
+    if(!game.Initialize || !game.Update || !game.Render)
+    {
+        CFATAL("Game Function Pointers must be assigned..!");
+        return -2;
+    }
 
-    if(!ApplicationCreate(&appConfig))
+    if(!ApplicationCreate(&game))
     {
         CFATAL("Something Went Wrong When Creating Application..!\n");
     }
+
 
     ApplicationRun();
 

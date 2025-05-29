@@ -1,6 +1,7 @@
 #pragma once
 #include "Defines.h"
 
+struct Game;
 struct ApplicataionConfig
 {
     int32 x;
@@ -11,6 +12,6 @@ struct ApplicataionConfig
 };
 
 
-bool8 ApplicationCreate(ApplicataionConfig* appConfig);
+bool8 ApplicationCreate(Game* gameInstance);
 
 bool8 ApplicationRun();
