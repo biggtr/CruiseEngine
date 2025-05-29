@@ -1,5 +1,6 @@
-#ifdef CPLATFORM_WINDOWS
 #include "Platform.h"
+
+#ifdef CPLATFORM_WINDOWS
 #include <windows.h>
 
 struct PlatfromWindow
@@ -12,8 +13,14 @@ struct PlatfromWindow
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 
+
 }
-void PlatformMessageHandler();
+void PlatformEventLoop(platfPlatformWindow)
+{
+    while(true)
+    {
+    }
+}
 
 void PlatfromStartup(PlatfromWindow &window, int32 x, int32 y, uint32 width, uint32 height)
 {

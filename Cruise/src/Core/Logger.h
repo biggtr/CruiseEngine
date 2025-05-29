@@ -18,10 +18,9 @@ void Log(LogLevel level, const char* message, ...);
 
 
 
-
-#define CFATAL(message, ...) Log(LogLevel::FATAL, message, __VA_ARGS__);
-#define CERROR(message, ...) Log(LogLevel::ERROR, message, __VA_ARGS__);
-#define CTRACE(message, ...) Log(LogLevel::TRACE, message, __VA_ARGS__);
-#define CDEBUG(message, ...) Log(LogLevel::DEBUG, message, __VA_ARGS__);
-#define CWARN(message, ...)  Log(LogLevel::WARN, message, __VA_ARGS__);
-#define CINFO(message, ...)  Log(LogLevel::INFO, message, __VA_ARGS__);
+#define CFATAL(message, ...) Log(LogLevel::FATAL, message, ##__VA_ARGS__);
+#define CERROR(message, ...) Log(LogLevel::ERROR, message, ##__VA_ARGS__);
+#define CTRACE(message, ...) Log(LogLevel::TRACE, message, ##__VA_ARGS__);
+#define CDEBUG(message, ...) Log(LogLevel::DEBUG, message, ##__VA_ARGS__);
+#define CWARN(message, ...)  Log(LogLevel::WARN, message, ##__VA_ARGS__);
+#define CINFO(message, ...)  Log(LogLevel::INFO, message, ##__VA_ARGS__);

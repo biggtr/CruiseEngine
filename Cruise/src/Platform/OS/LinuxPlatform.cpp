@@ -1,11 +1,21 @@
-#include "Core/assert.h"
-#include <X11/X.h>
-#include <stdlib.h>
 #include "Platform.h"
-#include <X11/Xlib.h>
+#include "Core/Logger.h"
+#include "Core/assert.h"
+#include <stdlib.h>
 
 #ifdef CPLATFORM_LINUX
-struct PlatformWindow
+#include <X11/X.h>
+#include <stdlib.h>
+#include <X11/Xlib.h>
+
+
+#define KEY_ESC 9
+#define KEY_W 25
+#define KEY_A 38
+#define KEY_S 39
+#define KEY_D 40
+
+struct Platform
 {
     Display* display;
     Window windowDisplay;
@@ -13,53 +23,81 @@ struct PlatformWindow
     int32 screen;
 };
 
-bool8 PlatfromStartup(PlatformWindow** outWindow, int32 x, int32 y, uint32 width, uint32 height)
+bool8 PlatfromStartup(Platform** outWindow, int32 x, int32 y, uint32 width, uint32 height)
 {
-    *outWindow = (PlatformWindow*)malloc(sizeof(PlatformWindow));
-    PlatformWindow* window = *outWindow;
+    *outWindow = (Platform*)malloc(sizeof(Platform));
+    Platform* window = *outWindow;
 
-    window->display = XOpenDisplay(":0");
-    window->screen = DefaultScreen(window->display);
-    Window rootWindow = RootWindow(window->display, window->screen);
+    window->display = XOpenDisplay(NULL);
     CASSERT_MSG(window->display, "Connection hasnt been established correctly\n");
+    window->screen = DefaultScreen(window->display);
+    CINFO("the width of our screen is : %d", DisplayWidth(window->display, window->screen));
+    CINFO("the height of our screen is : %d", DisplayHeight(window->display, window->screen));
     window->windowDisplay = XCreateSimpleWindow(window->display, 
                         RootWindow(window->display, window->screen),
                         x, y,
                         width, height,
-                        1,
-                        BlackPixel(window->display, window->screen), 
+                        0,
+                        0,
                         WhitePixel(window->display, window->screen)
                        ); 
-    XSelectInput(window->display, window->windowDisplay, ExposureMask | KeyPressMask);
-    XMapWindow(window->display, window->windowDisplay);
+    
+    // making the window visable on the screen 
+    XMapWindow(window->display, window->windowDisplay); 
+
+    // selecting the events i want to listen to 
+    XSelectInput(window->display, window->windowDisplay,
+            KeyPressMask | KeyReleaseMask |
+            ButtonPressMask | ButtonReleaseMask | 
+            PointerMotionMask | ExposureMask
+            );
+    
 
     return TRUE;
 
 }
-void PlatformEventLoop(PlatformWindow& window)
+bool8 PlatformEventLoop(Platform* window)
 {
-    while(TRUE)
+    while(XPending(window->display) > 0)
     {
-        XNextEvent(window.display, &window.event);
-        if(window.event.type == Expose)
+        XNextEvent(window->display, &window->event);
+        
+        switch (window->event.type) 
         {
-            XFillRectangle(window.display, window.windowDisplay, DefaultGC(window.display, window.screen),
-                          20, 20, 100, 100);
-        }
-        if(window.event.type == KeyPress)
-        {
-            break;
+            case KeyPress:
+                switch (window->event.xkey.keycode) 
+                {
+                    case KEY_ESC:
+                        CINFO("escape key pressed");
+                        break;
+                    case KEY_W:
+                        CINFO("W key pressed");
+                        break;
+                    case KEY_A:
+                        CINFO("A key pressed");
+                        break;
+                    case KEY_S:
+                        CINFO("S key pressed");
+                        break;
+                    case KEY_D:
+                        CINFO("D key pressed");
+                        break;
+                }                
+                break;
         }
     }
-
+    XFlush(window->display);
+    return TRUE;
 }
-void PlatformShutdown(PlatformWindow* window)
+bool8 PlatformShutdown(Platform** platform)
 {
-    if(window)
+    Platform* outPlatform = *platform;
+    if(outPlatform)
     {
-        XDestroyWindow(window->display, window->windowDisplay);
-        XCloseDisplay(window->display);
+        XDestroyWindow(outPlatform->display, outPlatform->windowDisplay);
+        XCloseDisplay(outPlatform->display);
+        free(outPlatform);
     }
+    return TRUE;
 }
-
 #endif
